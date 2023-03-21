@@ -1,0 +1,82 @@
+WaitEvent(x): >
+  "Name": "WaitEvent",
+  "Params": ["(x)"]
+
+WriteSel(x): >
+  "Name": "WriteSel",
+  "Params": ["CPU0_Status", "(x)", "0x07", "0xD0", "0x6F", "0xFF", "0xFF", "0xFF", "0x6C", "0x01"]
+
+WriteGPIO(x): >
+  "Name": "WriteGPIO",
+  "Params": ["(x)"]
+
+TriggerProcHot: >
+  "Name": "WriteGPIO",
+  "Params": ["ASSERT_CPU0_PROCHOT_BMC"]
+
+CheckFlagFiles(x): >
+  "Name": "CheckFlagFiles",
+  "Params": ["(x)"]
+
+CheckFlagFiles(x,y): >
+  "Name": "CheckFlagFiles",
+  "Params": ["(x)","(y)"]
+
+ResetChip(x,y): >
+  "Name": "ResetChip",
+  "Params": ["(x)", "(y)"]
+
+(x): >
+  "Name": "(x)",
+  "Params": []
+
+Goal:
+  Concurrent:
+    - WaitEvent(SMB_P0_VDDIO_ALT)
+    - WaitEvent(P0_VDDIO_OCP_R_N)
+    - WaitEvent(SMB_P0_VDDCR0_SOC_ALT)
+    - WaitEvent(PCC1_V33_P0_VDDCR1_N)
+    - WaitEvent(SMB_P0_VDDCR1_VDD11_ALT)
+    - WaitEvent(PCC0_V33_P0_VDDCR0_N)
+
+  # StepByStep:
+  #   - WaitEvent(SMB_P0_VDDIO_ALT):
+  #       CheckFlagFiles(VDDIO_TEMP):
+  #         - StepByStep:
+  #           - WriteSel(SMB_P0_VDDIO_ALT)
+  #           - TriggerProcHot
+  #           - TerminateAll
+  #         - StepByStep:
+  #           - ResetChip(11,5E)
+  #           - TerminateAll
+  #   - WaitEvent(P0_VDDIO_OCP_R_N):
+  #       - WriteSel(P0_VDDIO_OCP_R_N)
+  #       - TriggerProcHot
+  #       - TerminateAll
+
+    # - WaitEvent(SMB_P0_VDDCR0_SOC_ALT):
+    #     CheckFlagFiles(VDDCR0_TEMP,VDDCR_SOC_TEMP):
+    #       - StepByStep:
+    #         - WriteSel(SMB_P0_VDDCR0_SOC_ALT)
+    #         - TriggerProcHot
+    #         - TerminateAll
+    #       - StepByStep:
+    #         - ResetChip(11,58)
+    #         - TerminateAll
+    # - WaitEvent(PCC1_V33_P0_VDDCR1_N):
+    #     - WriteSel(PCC1_V33_P0_VDDCR1_N)
+    #     - TriggerProcHot
+    #     - TerminateAll
+    # - WaitEvent(SMB_P0_VDDCR1_VDD11_ALT):
+    #     CheckFlagFiles(VDDCR1_TEMP,VDD11_TEMP):
+    #       - StepByStep:
+    #         - WriteSel(SMB_P0_VDDCR1_VDD11_ALT)
+    #         - TriggerProcHot
+    #         - TerminateAll
+    #       - StepByStep:
+    #         - ResetChip(11,5A)
+    #         - TerminateAll
+    # - WaitEvent(PCC0_V33_P0_VDDCR0_N):
+    #     - WriteSel(PCC0_V33_P0_VDDCR0_N)
+    #     - TriggerProcHot
+    #     - TerminateAll
